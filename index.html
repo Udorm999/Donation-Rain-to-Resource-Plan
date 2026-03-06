@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rain To Resource System - Charity</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* ===== PAGE 1 ===== */
+  #page1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+    background: linear-gradient(135deg, #0a1628 0%, #0d3b6e 40%, #1a6b9e 70%, #00c6ff 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .rain-drops {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .drop {
+    position: absolute;
+    width: 2px;
+    background: linear-gradient(to bottom, transparent, rgba(150,210,255,0.6));
+    animation: fall linear infinite;
+    top: -100px;
+  }
+
+  @keyframes fall { to { transform: translateY(110vh); } }
+
+  .page1-card {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 24px;
+    padding: 48px 56px;
+    text-align: center;
+    max-width: 560px;
+    width: 90%;
+    position: relative;
+    z-index: 10;
+    box-shadow: 0 24px 80px rgba(0,0,50,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+
+  .project-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    letter-spacing: 3px;
+    color: #ffffff;
+    text-shadow: 0 0 30px rgba(0,198,255,0.8), 0 2px 4px rgba(0,0,0,0.5);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .rain-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    display: block;
+    animation: bounce 2s ease-in-out infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+    color: rgba(150,210,255,0.9);
+    margin-bottom: 32px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .question {
+    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+    color: #ffffff;
+    font-weight: 700;
+    margin-bottom: 36px;
+    line-height: 1.5;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-yes {
+    background: linear-gradient(135deg, #00c853, #00e676);
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 1.2rem;
+    padding: 14px 48px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0,200,83,0.5);
+    transition: transform 0.2s, box-shadow 0.2s;
+    letter-spacing: 1px;
+    position: relative;
+    z-index: 10;
+  }
+
+  .btn-yes:hover {
+    transform: scale(1.08);
+    box-shadow: 0 12px 32px rgba(0,200,83,0.7);
+  }
+
+  .btn-no {
+    background: linear-gradient(135deg, #f44336, #ff5252);
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 1.2rem;
+    padding: 14px 48px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    position: fixed;
+    box-shadow: 0 8px 24px rgba(244,67,54,0.4);
+    letter-spacing: 1px;
+    z-index: 9999;
+    transition: none;
+  }
+
+  /* ===== GIF OVERLAY ===== */
+  .gif-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    cursor: pointer;
+  }
+
+  .gif-overlay.active { display: flex; }
+
+  .gif-overlay img {
+    max-width: min(500px, 90vw);
+    max-height: 70vh;
+    border-radius: 16px;
+    box-shadow: 0 0 60px rgba(0,198,255,0.5);
+  }
+
+  .gif-caption {
+    margin-top: 20px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: center;
+    padding: 0 20px;
+  }
+
+  /* ===== PAGE 2 ===== */
+  #page2 {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+    overflow: hidden;
+    background: #0a0a0a;
+  }
+
+  .p2-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 20% 20%, #1a0533 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, #0d2b0a 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 50%, #1a1a2e 0%, #0a0a0a 100%);
+  }
+
+  .p2-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    animation: glowPulse 4s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+
+  .p2-glow-1 { width: 400px; height: 400px; background: rgba(255,215,0,0.08); top: -100px; left: -100px; }
+  .p2-glow-2 { width: 500px; height: 500px; background: rgba(0,255,136,0.06); bottom: -150px; right: -100px; animation-delay: 2s; }
+
+  @keyframes glowPulse {
+    from { opacity: 0.5; transform: scale(1); }
+    to { opacity: 1; transform: scale(1.2); }
+  }
+
+  .money-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .money {
+    position: absolute;
+    font-size: 1.5rem;
+    animation: moneyFloat linear infinite;
+    opacity: 0.15;
+  }
+
+  @keyframes moneyFloat {
+    0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.2; }
+    90% { opacity: 0.15; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+
+  .page2-card {
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(30px);
+    border: 1px solid rgba(255,215,0,0.2);
+    border-radius: 28px;
+    padding: 52px 60px;
+    text-align: center;
+    max-width: 600px;
+    width: 90%;
+    position: relative;
+    z-index: 10;
+    box-shadow: 0 0 80px rgba(255,215,0,0.08), 0 24px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,215,0,0.2);
+  }
+
+  .p2-icon { font-size: 3.5rem; margin-bottom: 16px; display: block; animation: spin 20s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .p2-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    letter-spacing: 4px;
+    background: linear-gradient(135deg, #ffd700, #ffec6e, #ffa500);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+
+  .p2-sub {
+    font-size: 0.85rem;
+    color: rgba(255,215,0,0.6);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    font-weight: 600;
+  }
+
+  .p2-amount {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 8vw, 5rem);
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #00ff88, #00e676);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin: 8px 0;
+    display: block;
+    animation: pulseMoney 2s ease-in-out infinite;
+  }
+
+  @keyframes pulseMoney {
+    0%, 100% { filter: drop-shadow(0 0 10px rgba(0,255,136,0.5)); }
+    50% { filter: drop-shadow(0 0 30px rgba(0,255,136,0.9)); }
+  }
+
+  .p2-question {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    color: rgba(255,255,255,0.9);
+    font-weight: 700;
+    margin-bottom: 36px;
+    line-height: 1.5;
+  }
+
+  /* ===== PAGE 3 ===== */
+  #page3 {
+    display: none;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+    background: #0d5c2a;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .p3-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(0,180,80,0.25) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 50%, rgba(0,120,60,0.2) 0%, transparent 60%),
+      linear-gradient(180deg, #0a4020 0%, #0d5c2a 50%, #0a4020 100%);
+    z-index: 0;
+  }
+
+  .confetti-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .confetti-piece {
+    position: absolute;
+    border-radius: 2px;
+    top: -30px;
+    animation: confettiFall linear infinite;
+  }
+
+  @keyframes confettiFall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  .p3-left-col, .p3-right-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 10px;
+    width: clamp(140px, 20vw, 220px);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+    gap: 8px;
+  }
+
+  .p3-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+    letter-spacing: 3px;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .p3-img-slot {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    width: 100%;
+  }
+
+  .p3-img-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 10px;
+    max-height: 100%;
+    display: block;
+  }
+
+  .p3-right-mid-row {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+  }
+
+  .p3-right-mid-row .p3-img-slot { flex: 1; }
+
+  .page3-card {
+    background: rgba(30,100,60,0.75);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(0,255,136,0.35);
+    border-radius: 24px;
+    padding: clamp(16px, 3vh, 36px) clamp(16px, 3vw, 44px);
+    text-align: center;
+    flex: 1;
+    max-width: 480px;
+    min-width: 0;
+    margin: 16px 8px;
+    position: relative;
+    z-index: 10;
+    box-shadow: 0 0 60px rgba(0,255,136,0.15), 0 20px 60px rgba(0,0,0,0.4);
+    animation: cardAppear 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(6px, 1.5vh, 14px);
+  }
+
+  @keyframes cardAppear {
+    from { transform: scale(0.6); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .p3-emoji {
+    font-size: clamp(2rem, 5vh, 4rem);
+    display: block;
+    animation: partyBounce 0.5s ease-in-out infinite alternate;
+    line-height: 1;
+  }
+
+  @keyframes partyBounce {
+    from { transform: translateY(0) rotate(-5deg); }
+    to { transform: translateY(-10px) rotate(5deg); }
+  }
+
+  .p3-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    letter-spacing: 4px;
+    color: #ffffff;
+    text-shadow: 0 0 30px rgba(0,255,136,0.8), 0 3px 6px rgba(0,0,0,0.4);
+    line-height: 1;
+    margin: 0;
+  }
+
+  .p3-sub {
+    font-size: clamp(0.75rem, 1.4vw, 0.95rem);
+    color: rgba(210,255,235,0.9);
+    font-weight: 600;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .p3-amount-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #ffd700, #ffa500);
+    color: #0a2818;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
+    letter-spacing: 2px;
+    padding: clamp(8px,1.5vh,14px) clamp(16px,2.5vw,32px);
+    border-radius: 50px;
+    box-shadow: 0 6px 24px rgba(255,215,0,0.5);
+    animation: badgePop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s both;
+    white-space: nowrap;
+  }
+
+  @keyframes badgePop {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+  }
+
+  .p3-message {
+    font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+    color: rgba(200,255,230,0.8);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin: 0;
+  }
+
+  .heart-row {
+    font-size: clamp(1rem, 2vw, 1.6rem);
+    letter-spacing: 4px;
+    animation: heartbeat 1s ease-in-out infinite;
+  }
+
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+
+  @media (max-width: 600px) {
+    #page3 { flex-direction: column; overflow-y: auto; height: auto; min-height: 100vh; }
+    .p3-left-col, .p3-right-col { flex-direction: row; width: 100%; height: auto; padding: 8px; flex-wrap: wrap; }
+    .p3-img-slot { width: 45%; flex: none; height: 80px; }
+    .page3-card { margin: 8px; flex: none; width: calc(100% - 16px); }
+    .p3-right-mid-row { flex: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== PAGE 1 ========== -->
+<div id="page1">
+  <div class="rain-drops" id="rainDrops"></div>
+  <div class="page1-card">
+    <span class="rain-icon">🌧️</span>
+    <div class="project-title">Rain To Resource System</div>
+    <div class="subtitle">✦ Charity Initiative ✦</div>
+    <div class="question">Do you want to participate<br>in our charity? 💙</div>
+    <div class="btn-row">
+      <button class="btn-yes" onclick="page1Yes()">✅ Yes!</button>
+      <button class="btn-no" id="noBtn1" onclick="page1No()">❌ No</button>
+    </div>
+  </div>
+</div>
+
+<!-- GIF Overlay Page 1 -->
+<div class="gif-overlay" id="gifOverlay1" onclick="closeGif1()">
+  <img src="assets/say-yes.gif" alt="Say Yes!" />
+  <div class="gif-caption">💬 Click anywhere to dismiss... then say YES! 😄</div>
+</div>
+
+<!-- ========== PAGE 2 ========== -->
+<div id="page2">
+  <div class="p2-bg"></div>
+  <div class="p2-glow p2-glow-1"></div>
+  <div class="p2-glow p2-glow-2"></div>
+  <div class="money-particles" id="moneyParticles"></div>
+  <div class="page2-card">
+    <span class="p2-icon">💎</span>
+    <div class="p2-title">Rain To Resource System</div>
+    <div class="p2-sub">🌿 Make a Difference Today 🌿</div>
+    <span class="p2-amount">$888</span>
+    <div class="p2-question">Would you like to donate <strong>$888</strong><br>to our charity? 🌍</div>
+    <div class="btn-row" style="position:relative; z-index:1;">
+      <button class="btn-yes" onclick="page2Yes()">💚 Yes, I'll Donate!</button>
+      <button class="btn-no" id="noBtn2" onclick="page2No()">❌ No</button>
+    </div>
+  </div>
+</div>
+
+<!-- GIF Overlay Page 2 - First No -->
+<div class="gif-overlay" id="gifOverlay2a" onclick="closeGif2a()">
+  <img src="assets/no-first.gif" alt="Think Again!" />
+  <div class="gif-caption">🥺 Are you sure...? Click to reconsider!</div>
+</div>
+
+<!-- GIF Overlay Page 2 - Second No -->
+<div class="gif-overlay" id="gifOverlay2b" onclick="closeGif2b()">
+  <img src="assets/no-second.gif" alt="Really?!" />
+  <div class="gif-caption">😤 REALLY?! Click to come back to your senses!</div>
+</div>
+
+<!-- ========== PAGE 3 ========== -->
+<div id="page3">
+  <div class="p3-bg"></div>
+  <div class="confetti-container" id="confettiContainer"></div>
+
+  <!-- LEFT COLUMN -->
+  <div class="p3-left-col">
+    <div class="p3-label">Your Bank</div>
+    <div class="p3-img-slot">
+      <img src="assets/left-top.avif" alt="Your Bank" />
+    </div>
+    <div class="p3-img-slot">
+      <img src="assets/left-mid.gif" alt="Crying" />
+    </div>
+    <div class="p3-img-slot">
+      <img src="assets/left-bot.webp" alt="Cortisol" />
+    </div>
+  </div>
+
+  <!-- CENTER CARD -->
+  <div class="page3-card">
+    <span class="p3-emoji">🎉</span>
+    <div class="p3-title">THANK YOU!</div>
+    <div class="p3-sub">You're amazing! Your generous contribution<br>to <strong>Rain To Resource System</strong> will help<br>transform lives around the world. 🌍</div>
+    <div class="p3-amount-badge">💰 $888 DONATED 💰</div>
+    <div class="p3-message">🌧️ Every drop counts. Every dollar matters. 🌱</div>
+    <div class="heart-row">❤️ 🧡 💛 💚 💙 💜</div>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div class="p3-right-col">
+    <div class="p3-label">The world</div>
+    <div class="p3-img-slot">
+      <img src="assets/right-top.webp" alt="The World" />
+    </div>
+    <div class="p3-right-mid-row">
+      <div class="p3-img-slot">
+        <img src="assets/right-mid1.jpg" alt="Cat" />
+      </div>
+      <div class="p3-img-slot">
+        <img src="assets/right-mid2.jpg" alt="Dog" />
+      </div>
+    </div>
+    <div class="p3-img-slot">
+      <img src="assets/right-bot.gif" alt="Cortisol High" />
+    </div>
+  </div>
+</div>
+
+<script>
+  // ===== RAIN DROPS =====
+  const rainContainer = document.getElementById('rainDrops');
+  for (let i = 0; i < 80; i++) {
+    const drop = document.createElement('div');
+    drop.className = 'drop';
+    drop.style.left = Math.random() * 100 + 'vw';
+    drop.style.height = (Math.random() * 60 + 40) + 'px';
+    drop.style.animationDuration = (Math.random() * 1.5 + 0.5) + 's';
+    drop.style.animationDelay = (Math.random() * 3) + 's';
+    drop.style.opacity = Math.random() * 0.5 + 0.2;
+    rainContainer.appendChild(drop);
+  }
+
+  // ===== MONEY PARTICLES =====
+  const moneyContainer = document.getElementById('moneyParticles');
+  const moneyEmojis = ['💵','💴','💶','💷','💰','🪙','💎'];
+  for (let i = 0; i < 30; i++) {
+    const m = document.createElement('div');
+    m.className = 'money';
+    m.textContent = moneyEmojis[Math.floor(Math.random() * moneyEmojis.length)];
+    m.style.left = Math.random() * 100 + 'vw';
+    m.style.animationDuration = (Math.random() * 8 + 6) + 's';
+    m.style.animationDelay = (Math.random() * 10) + 's';
+    moneyContainer.appendChild(m);
+  }
+
+  // ===== NO BUTTON SAFE MOVE =====
+  function safeMove(btn) {
+    // Wait a tick so offsetWidth/Height are available
+    requestAnimationFrame(() => {
+      const btnW = btn.offsetWidth || 140;
+      const btnH = btn.offsetHeight || 52;
+      const maxX = window.innerWidth - btnW;
+      const maxY = window.innerHeight - btnH;
+      btn.style.left = Math.max(0, Math.random() * maxX) + 'px';
+      btn.style.top  = Math.max(0, Math.random() * maxY) + 'px';
+    });
+  }
+
+  // ===== PAGE 1 LOGIC =====
+  let p1NoCount = 0;
+  const noBtn1 = document.getElementById('noBtn1');
+  noBtn1.style.left = '60%';
+  noBtn1.style.top = '70%';
+
+  function page1No() {
+    p1NoCount++;
+    if (p1NoCount === 1) {
+      document.getElementById('gifOverlay1').classList.add('active');
+    }
+    safeMove(noBtn1);
+  }
+
+  function closeGif1() {
+    document.getElementById('gifOverlay1').classList.remove('active');
+  }
+
+  function page1Yes() {
+    document.getElementById('gifOverlay1').classList.remove('active');
+    document.getElementById('page1').style.display = 'none';
+    document.getElementById('page2').style.display = 'flex';
+    noBtn2.style.left = '60%';
+    noBtn2.style.top = '75%';
+  }
+
+  // ===== PAGE 2 LOGIC =====
+  let p2NoCount = 0;
+  const noBtn2 = document.getElementById('noBtn2');
+  noBtn2.style.left = '60%';
+  noBtn2.style.top = '75%';
+
+  function page2No() {
+    p2NoCount++;
+    if (p2NoCount === 1) {
+      document.getElementById('gifOverlay2a').classList.add('active');
+    } else {
+      document.getElementById('gifOverlay2a').classList.remove('active');
+      document.getElementById('gifOverlay2b').classList.add('active');
+    }
+    safeMove(noBtn2);
+  }
+
+  function closeGif2a() {
+    document.getElementById('gifOverlay2a').classList.remove('active');
+  }
+
+  function closeGif2b() {
+    document.getElementById('gifOverlay2b').classList.remove('active');
+  }
+
+  function page2Yes() {
+    document.getElementById('gifOverlay2a').classList.remove('active');
+    document.getElementById('gifOverlay2b').classList.remove('active');
+    document.getElementById('page2').style.display = 'none';
+    document.getElementById('page3').style.display = 'flex';
+    launchConfetti();
+  }
+
+  // ===== CONFETTI =====
+  function launchConfetti() {
+    const container = document.getElementById('confettiContainer');
+    const colors = ['#ff6b6b','#ffd700','#00ff88','#00bfff','#ff69b4','#ff8c00','#7cfc00','#da70d6'];
+    for (let i = 0; i < 120; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti-piece';
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.background = colors[Math.floor(Math.random() * colors.length)];
+      c.style.width = (Math.random() * 10 + 5) + 'px';
+      c.style.height = (Math.random() * 20 + 10) + 'px';
+      c.style.animationDuration = (Math.random() * 3 + 2) + 's';
+      c.style.animationDelay = (Math.random() * 3) + 's';
+      c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      container.appendChild(c);
+    }
+  }
+</script>
+</body>
+</html>
